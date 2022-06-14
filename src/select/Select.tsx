@@ -1,4 +1,4 @@
-import { createContext, createMemo, JSXElement, ParentProps, Show, useContext } from 'solid-js';
+import { createContext, createMemo, createSignal, JSXElement, ParentProps, Show, useContext } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { DropdownIcon } from './assets/DropdownIcon';
 import { Dropdown } from './Dropdown';
@@ -6,12 +6,15 @@ import { isArray, isObject } from './utils/utils';
 
 type SelectState<T> = {
     value?: T;
+    show: boolean;
 }
 
 type SelectContext<T = any> = {
     state: SelectState<T>;
     setValue: (v: T) => void;
     reset: () => void;
+    open: () => void;
+    close: () => void;
 }
 
 const SelectContext = createContext<SelectContext>();
@@ -26,22 +29,38 @@ export const useSelect = <T extends any>() => {
 
 export type SelectProps<T> = {
     placeholder?: string;
+    show?: boolean;
     value?: T;
     onValueChange?: (v: T) => void;
 }
 
 export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
 
+    const [ref, setRef] = createSignal<HTMLElement>();
     const [state, setState] = createStore<SelectState<T>>({
-        value: props.value
+        value: props.value,
+        show: props.show || false,
     });
 
     const setValue = (v: T) => {
         setState('value', v);
+        close();
     };
 
     const reset = () => {
         setState('value', undefined);
+    };
+
+    const open = () => {
+        setState('show', true);
+    };
+
+    const close = () => {
+        setState('show', false);
+    };
+
+    const toggle = () => {
+        setState('show', !state.show);
     };
 
     const defaultValueView = createMemo<JSXElement>(() => {
@@ -59,10 +78,12 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
         <SelectContext.Provider value={{
             state,
             setValue,
-            reset
+            reset,
+            open,
+            close,
         }}>
-            <div class="relative">
-                <button class="select">
+            <div class="relative" ref={setRef}>
+                <button class="select" onClick={toggle}>
                     <span class="flex items-center">
                         <Show
                             when={state.value}
@@ -75,11 +96,12 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
                         <DropdownIcon/>
                     </span>
                 </button>
-
-                <Dropdown>
-                    {props.children}
-                </Dropdown>
             </div>
+
+            <Dropdown reference={ref} show={state.show}>
+                {props.children}
+            </Dropdown>
+
         </SelectContext.Provider>
     );
 }

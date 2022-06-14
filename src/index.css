@@ -42,7 +42,6 @@
 .dropdown {
     @apply
     z-10
-    mt-1
     w-full
     bg-white
     shadow-lg
