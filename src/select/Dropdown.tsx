@@ -1,6 +1,7 @@
 import { Accessor, createEffect, createSignal, onCleanup, ParentProps, Show } from 'solid-js';
 import { Portal } from 'solid-js/web';
 import { usePopper } from './popper/usePopper';
+import { Fade } from './assets/Fade';
 
 type DropdownProps = {
     reference: Accessor<HTMLElement | undefined>;
@@ -12,12 +13,16 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
     const [dropdown, setDropdown] = createSignal<HTMLElement>();
 
     createEffect(() => {
-        setShow(props.show);
+        if (props.show) {
+            setShow(true);
+        }
     });
 
     onCleanup(() => {
         instance()?.destroy();
     });
+
+    const close = () => setShow(false);
 
     const instance = usePopper(props.reference, dropdown, {
         modifiers: [{
@@ -36,9 +41,13 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
                     class="z-50 inline-flex"
                     style={{'min-width': props.reference()?.offsetWidth + 'px'}}
                 >
-                    <ul class="dropdown">
-                        {props.children}
-                    </ul>
+                    <Fade onDone={close}>
+                        <Show when={props.show}>
+                            <ul class="dropdown">
+                                {props.children}
+                            </ul>
+                        </Show>
+                    </Fade>
                 </div>
             </Portal>
         </Show>

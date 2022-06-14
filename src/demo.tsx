@@ -10,7 +10,7 @@ export const App: Component = () => {
 
     return (
         <main class="p-2">
-            <div class="max-w-sm mx-auto">
+            <div class="max-w-xs mx-auto">
                 <Select
                     placeholder="select your option"
                     onValueChange={valueChange}
