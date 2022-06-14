@@ -1,4 +1,4 @@
-import { Component } from 'solid-js';
+import { Component, For } from 'solid-js';
 import { Select } from './select/Select';
 import { Option } from './select/Option';
 
@@ -8,21 +8,21 @@ export const App: Component = () => {
         console.log(v);
     }
 
+    const options = new Array(20).fill(0);
+
     return (
         <main class="p-2">
             <div class="max-w-xs mx-auto">
                 <Select
                     placeholder="select your option"
                     onValueChange={valueChange}
-                    value={4}
+                    value={10}
                 >
-                    <Option value={1}>Option 1</Option>
-                    <Option value={2}>Option 2</Option>
-                    <Option value={3}>Option 3</Option>
-                    <Option value={4}>Option 4</Option>
-                    <Option value={5}>Option 5</Option>
-                    <Option value={6}>Option 6</Option>
-                    <Option value={7}>Option 7</Option>
+                    <For each={options}>
+                        {(_, i) => (
+                            <Option value={i() + 1}>Option {i() + 1}</Option>
+                        )}
+                    </For>
                 </Select>
             </div>
         </main>
