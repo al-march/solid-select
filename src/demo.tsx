@@ -3,7 +3,7 @@ import { Component } from 'solid-js';
 export const App: Component = () => {
 
     return (
-        <main>
+        <main class="p-2">
 
         </main>
     );
