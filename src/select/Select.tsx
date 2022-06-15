@@ -7,6 +7,7 @@ import { isArray, isObject } from './utils/utils';
 export const enum TestSelectors {
     SELECT = 'select',
     PLACEHOLDER = 'placeholder',
+    VALUE = 'value',
     DROPDOWN = 'dropdown',
     OPTION = 'option',
 }
@@ -119,7 +120,7 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
                     onClick={toggle}
                     onKeyDown={onKeyDown}
                 >
-                    <span class="flex items-center">
+                    <span class="flex items-center" data-testid={TestSelectors.VALUE}>
                         <Show
                             when={state.value}
                             fallback={
@@ -140,7 +141,6 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
             <Dropdown reference={ref} show={state.show}>
                 {props.children}
             </Dropdown>
-
         </SelectContext.Provider>
     );
 }

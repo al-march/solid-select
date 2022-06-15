@@ -36,7 +36,6 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
     const close = () => setShow(false);
 
     const onKeyDown = (e: KeyboardEvent) => {
-        console.log('dropdown keyboard event', e);
         const option = e.target as HTMLElement;
         switch (e.code) {
             case 'Escape':
