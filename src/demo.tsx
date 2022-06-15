@@ -12,10 +12,11 @@ export const App: Component = () => {
 
     return (
         <main class="p-2">
-            <div class="max-w-xs mx-auto">
+            <div style="width: 240px" class="max-w-xs mx-auto">
                 <Select
                     placeholder="select your option"
                     onValueChange={valueChange}
+                    value={20}
                     customView={v => (
                         <span><b>Checked:</b> {v}</span>
                     )}

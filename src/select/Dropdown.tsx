@@ -4,7 +4,7 @@ import {
     createEffect,
     createSignal,
     on,
-    onCleanup,
+    onMount,
     ParentProps,
     Show
 } from 'solid-js';
@@ -24,6 +24,15 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
     const [show, setShow] = createSignal();
     const [dropdown, setDropdown] = createSignal<HTMLElement>();
 
+    onMount(() => usePopper(props.reference, dropdown, {
+        modifiers: [{
+            name: 'offset',
+            options: {
+                offset: [0, 4],
+            },
+        }]
+    }));
+
     createEffect(() => {
         if (props.show) {
             setShow(true);
@@ -36,35 +45,24 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
         isShow && focusOption(opts as HTMLButtonElement[]);
     }, {defer: true}));
 
-    onCleanup(() => {
-        instance()?.destroy();
-    });
-
     const options = children(() => props.children);
 
     const focusOption = (options: HTMLButtonElement[]) => {
-        if (!options || !options.length) {
+        if (!(options && !!options.length)) {
             return;
         }
-
-        for (let option of options) {
-            if (isChecked(option)) {
-                option.focus();
-                return;
-            }
-        }
-
-        options[0].focus();
+        const option = findCheckedOption(options);
+        option?.focus();
     };
 
-    const instance = usePopper(props.reference, dropdown, {
-        modifiers: [{
-            name: 'offset',
-            options: {
-                offset: [0, 8],
-            },
-        }]
-    });
+    const findCheckedOption = (options: HTMLButtonElement[]) => {
+        for (let option of options) {
+            if (isChecked(option)) {
+                return option;
+            }
+        }
+        return options[0];
+    };
 
     const close = () => setShow(false);
 
