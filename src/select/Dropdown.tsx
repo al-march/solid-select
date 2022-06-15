@@ -2,6 +2,7 @@ import { Accessor, createEffect, createSignal, onCleanup, ParentProps, Show } fr
 import { Portal } from 'solid-js/web';
 import { usePopper } from './popper/usePopper';
 import { Fade } from './assets/Fade';
+import { TestSelectors, useSelect } from './Select';
 
 type DropdownProps = {
     reference: Accessor<HTMLElement | undefined>;
@@ -9,6 +10,7 @@ type DropdownProps = {
 }
 
 export const Dropdown = (props: ParentProps<DropdownProps>) => {
+    const select = useSelect();
     const [show, setShow] = createSignal(props.show);
     const [dropdown, setDropdown] = createSignal<HTMLElement>();
 
@@ -22,8 +24,6 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
         instance()?.destroy();
     });
 
-    const close = () => setShow(false);
-
     const instance = usePopper(props.reference, dropdown, {
         modifiers: [{
             name: 'offset',
@@ -32,6 +32,29 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
             },
         }]
     });
+
+    const close = () => setShow(false);
+
+    const onKeyDown = (e: KeyboardEvent) => {
+        console.log('dropdown keyboard event', e);
+        const option = e.target as HTMLElement;
+        switch (e.code) {
+            case 'Escape':
+                e.preventDefault();
+                select.close();
+                break;
+            case 'ArrowDown':
+                e.preventDefault();
+                const nextOption = option.nextElementSibling as HTMLElement;
+                nextOption?.focus();
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                const prevOption = option.previousElementSibling as HTMLElement;
+                prevOption?.focus();
+                break;
+        }
+    };
 
     return (
         <Show when={show()}>
@@ -43,7 +66,7 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
                 >
                     <Fade onDone={close}>
                         <Show when={props.show}>
-                            <ul class="dropdown">
+                            <ul data-testid={TestSelectors.DROPDOWN} class="dropdown" onKeyDown={onKeyDown}>
                                 {props.children}
                             </ul>
                         </Show>

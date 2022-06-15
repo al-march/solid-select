@@ -4,6 +4,13 @@ import { DropdownIcon } from './assets/DropdownIcon';
 import { Dropdown } from './Dropdown';
 import { isArray, isObject } from './utils/utils';
 
+export const enum TestSelectors {
+    SELECT = 'select',
+    PLACEHOLDER = 'placeholder',
+    DROPDOWN = 'dropdown',
+    OPTION = 'option',
+}
+
 type SelectState<T> = {
     value?: T;
     show: boolean;
@@ -37,6 +44,7 @@ export type SelectProps<T> = {
 export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
 
     const [ref, setRef] = createSignal<HTMLElement>();
+    const [selectRef, setSelectRef] = createSignal<HTMLElement>();
     const [state, setState] = createStore<SelectState<T>>({
         value: props.value,
         show: props.show || false,
@@ -44,6 +52,7 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
 
     const setValue = (v: T) => {
         setState('value', v);
+        props.onValueChange?.(v);
         close();
     };
 
@@ -57,10 +66,15 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
 
     const close = () => {
         setState('show', false);
+        focusSelect();
     };
 
     const toggle = () => {
         setState('show', !state.show);
+    };
+
+    const focusSelect = () => {
+        selectRef()?.focus();
     };
 
     const defaultValueView = createMemo<JSXElement>(() => {
@@ -74,6 +88,20 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
         return <span>{value as string}</span>;
     });
 
+    const onKeyDown = (e: KeyboardEvent) => {
+        switch (e.code) {
+            case 'Space':
+            case 'Enter':
+                e.preventDefault();
+                open();
+                break;
+            case 'Escape':
+                e.preventDefault();
+                close();
+                break;
+        }
+    };
+
     return (
         <SelectContext.Provider value={{
             state,
@@ -83,11 +111,22 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
             close,
         }}>
             <div class="relative" ref={setRef}>
-                <button class="select" onClick={toggle}>
+                <button
+                    data-testid={TestSelectors.SELECT}
+                    class="select"
+                    tabIndex={1}
+                    ref={setSelectRef}
+                    onClick={toggle}
+                    onKeyDown={onKeyDown}
+                >
                     <span class="flex items-center">
                         <Show
                             when={state.value}
-                            fallback={<span>{props.placeholder} &nbsp;</span>}
+                            fallback={
+                                <span data-testid={TestSelectors.PLACEHOLDER}>
+                                    {props.placeholder} &nbsp;
+                                </span>
+                            }
                         >
                             {defaultValueView()}
                         </Show>
