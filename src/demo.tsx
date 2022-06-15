@@ -1,29 +1,34 @@
 import { Component, For } from 'solid-js';
 import { Select } from './select/Select';
 import { Option } from './select/Option';
+import { COUNTRIES, Country } from './countries.mock';
 
 export const App: Component = () => {
 
-    function valueChange(v: number) {
+    function valueChange(v: Country) {
         console.log(v);
     }
-
-    const options = new Array(20).fill(0);
 
     return (
         <main class="p-2">
             <div style="width: 240px" class="max-w-xs mx-auto">
-                <Select
+                <Select<Country>
                     placeholder="select your option"
                     onValueChange={valueChange}
-                    value={20}
+                    compareKey={v => v?.name}
                     customView={v => (
-                        <span><b>Checked:</b> {v}</span>
+                        <span style="width: 200px" class="text-left truncate">
+                            {v.unicodeFlag} {v.name} {v.iso2}
+                        </span>
                     )}
                 >
-                    <For each={options}>
-                        {(_, i) => (
-                            <Option value={i() + 1}>Option {i() + 1}</Option>
+                    <For each={COUNTRIES}>
+                        {(country) => (
+                            <Option value={country}>
+                                <span style="width: 200px" class="text-left truncate">
+                                    {country.unicodeFlag} {country.name}
+                                </span>
+                            </Option>
                         )}
                     </For>
                 </Select>

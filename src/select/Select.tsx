@@ -24,6 +24,7 @@ export const enum TestSelectors {
 type SelectState<T> = {
     value?: T;
     show: boolean;
+    compareKey?: (v: T) => any;
 }
 
 type SelectContext<T = any> = {
@@ -49,7 +50,8 @@ export type SelectProps<T> = {
     show?: boolean;
     value?: T;
     onValueChange?: (v: T) => void;
-    customView?: (v: string) => JSXElement;
+    customView?: (v: T) => JSXElement;
+    compareKey?: (v?: T) => any;
 }
 
 export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
@@ -59,6 +61,7 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
     const [state, setState] = createStore<SelectState<T>>({
         value: props.value,
         show: props.show || false,
+        compareKey: props.compareKey
     });
 
     createEffect(() => {
@@ -97,14 +100,17 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
     };
 
     const createView = (v: string) => {
-        const isCustom = !!props.customView;
-        return isCustom
-            ? props.customView?.(v)
-            : <span>{v}</span>;
+        return <span>{v}</span>;
     };
 
     const selectValue = createMemo<JSXElement>(() => {
+        const isCustom = !!props.customView;
         const value = state.value;
+
+        if (isCustom && value) {
+            return props.customView?.(value);
+        }
+
         if (isObject(value)) {
             return createView((value as object).toString());
         }
