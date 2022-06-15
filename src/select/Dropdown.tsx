@@ -43,12 +43,18 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
     const options = children(() => props.children);
 
     const focusOption = (options: HTMLButtonElement[]) => {
+        if (!options || !options.length) {
+            return;
+        }
+
         for (let option of options) {
             if (isChecked(option)) {
                 option.focus();
                 return;
             }
         }
+
+        options[0].focus();
     };
 
     const instance = usePopper(props.reference, dropdown, {

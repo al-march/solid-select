@@ -27,6 +27,16 @@ describe('Dropdown', () => {
         const option = screen.getByTestId(TestSelectors.OPTION);
         expect(option).toHaveFocus();
     });
+    test('should focus first option by default', () => {
+        render(() => (
+            <Select show>
+                <Option value={1}>1</Option>
+                <Option value={2}>2</Option>
+            </Select>
+        ));
+        const [option] = screen.getAllByTestId(TestSelectors.OPTION);
+        expect(option).toHaveFocus();
+    })
     test('should focus option by arrows', async () => {
         render(() => (
             <Select value={1} show>
