@@ -1,4 +1,13 @@
-import { createContext, createMemo, createSignal, JSXElement, ParentProps, Show, useContext } from 'solid-js';
+import {
+    createContext,
+    createEffect,
+    createMemo,
+    createSignal,
+    JSXElement,
+    ParentProps,
+    Show,
+    useContext
+} from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { DropdownIcon } from './assets/DropdownIcon';
 import { Dropdown } from './Dropdown';
@@ -49,6 +58,14 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
     const [state, setState] = createStore<SelectState<T>>({
         value: props.value,
         show: props.show || false,
+    });
+
+    createEffect(() => {
+        if (props.show) {
+            open();
+        } else {
+            close();
+        }
     });
 
     const setValue = (v: T) => {

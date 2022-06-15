@@ -1,8 +1,18 @@
-import { Accessor, createEffect, createSignal, onCleanup, ParentProps, Show } from 'solid-js';
+import {
+    Accessor,
+    children,
+    createEffect,
+    createSignal,
+    on,
+    onCleanup,
+    ParentProps,
+    Show
+} from 'solid-js';
 import { Portal } from 'solid-js/web';
 import { usePopper } from './popper/usePopper';
 import { Fade } from './assets/Fade';
 import { TestSelectors, useSelect } from './Select';
+import { isArray, isOptionChecked } from './utils/utils';
 
 type DropdownProps = {
     reference: Accessor<HTMLElement | undefined>;
@@ -11,7 +21,7 @@ type DropdownProps = {
 
 export const Dropdown = (props: ParentProps<DropdownProps>) => {
     const select = useSelect();
-    const [show, setShow] = createSignal(props.show);
+    const [show, setShow] = createSignal();
     const [dropdown, setDropdown] = createSignal<HTMLElement>();
 
     createEffect(() => {
@@ -20,9 +30,26 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
         }
     });
 
+    createEffect(on(show, (isShow) => {
+        const items = options();
+        const opts = isArray(items) ? items : [items];
+        isShow && focusOption(opts as HTMLElement[]);
+    }, {defer: true}));
+
     onCleanup(() => {
         instance()?.destroy();
     });
+
+    const options = children(() => props.children);
+
+    const focusOption = (options: HTMLElement[]) => {
+        for (let opt of options) {
+            if (isOptionChecked(opt)) {
+                opt.focus();
+                return;
+            }
+        }
+    };
 
     const instance = usePopper(props.reference, dropdown, {
         modifiers: [{
@@ -65,8 +92,12 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
                 >
                     <Fade onDone={close}>
                         <Show when={props.show}>
-                            <ul data-testid={TestSelectors.DROPDOWN} class="dropdown" onKeyDown={onKeyDown}>
-                                {props.children}
+                            <ul
+                                data-testid={TestSelectors.DROPDOWN}
+                                class="dropdown"
+                                onKeyDown={onKeyDown}
+                            >
+                                {options()}
                             </ul>
                         </Show>
                     </Fade>

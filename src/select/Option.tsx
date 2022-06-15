@@ -1,8 +1,9 @@
-import { createMemo, onMount, ParentProps } from 'solid-js';
+import { createMemo, ParentProps } from 'solid-js';
 import { TestSelectors, useSelect } from './Select';
 
 type OptionProps<T> = {
-    value: T
+    value: T;
+    disabled?: boolean;
 }
 
 export const Option = <T extends any>(props: ParentProps<OptionProps<T>>) => {
@@ -11,16 +12,7 @@ export const Option = <T extends any>(props: ParentProps<OptionProps<T>>) => {
 
     const active = createMemo(() => ctx.state.value === props.value);
 
-    onMount(() => {
-        if (active()) {
-            ref.focus();
-        }
-    });
-
     const checkOption = () => {
-        if (ctx.state.value === props.value) {
-            return;
-        }
         ctx.setValue(props.value);
     };
 

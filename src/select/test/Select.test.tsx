@@ -21,7 +21,7 @@ describe('Select', () => {
     });
     test('should be opened by props', () => {
         render(() => <TestSelect show/>);
-        expect(getByTestId(document.body, TestSelectors.DROPDOWN)).toBeInTheDocument();
+        expect(screen.getByTestId(TestSelectors.DROPDOWN)).toBeInTheDocument();
     });
     test('should be opened dropdown by click', () => {
         render(() => <TestSelect/>);
