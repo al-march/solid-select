@@ -4,6 +4,7 @@ import { TestSelectors, useSelect } from './Select';
 type OptionProps<T> = {
     value: T;
     disabled?: boolean;
+    onCheck?: (v: T) => void;
 }
 
 export const Option = <T extends any>(props: ParentProps<OptionProps<T>>) => {
@@ -14,6 +15,7 @@ export const Option = <T extends any>(props: ParentProps<OptionProps<T>>) => {
 
     const checkOption = () => {
         ctx.setValue(props.value);
+        props.onCheck?.(props.value);
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -27,20 +29,19 @@ export const Option = <T extends any>(props: ParentProps<OptionProps<T>>) => {
     };
 
     return (
-        <li
+        <button
             data-testid={TestSelectors.OPTION}
             ref={el => ref = el}
             tabIndex={0}
             class="option"
             classList={{
-                'option-active': active()
+                'option-active': active(),
             }}
+            disabled={!!props.disabled}
             onClick={checkOption}
             onKeyDown={onKeyDown}
         >
-            <div class="flex items-center">
-                {props.children}
-            </div>
-        </li>
+            {props.children}
+        </button>
     );
 };

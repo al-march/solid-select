@@ -59,6 +59,9 @@
 
 .option {
     @apply
+    flex
+    items-center
+    w-full
     cursor-pointer
     select-none
     relative
@@ -67,14 +70,16 @@
     pr-9
     text-gray-900
     transition-all
+    truncate
+    overflow-hidden
 }
 
-.option:hover {
+.option:hover:not(.option-disabled) {
     @apply
     bg-gray-100
 }
 
-.option:focus {
+.option:focus:not(.option-disabled) {
     @apply
     bg-gray-100
     ring-1
@@ -86,4 +91,11 @@
 .option-active {
     @apply
     bg-gray-200
+}
+
+.option:disabled {
+    @apply
+    bg-gray-200
+    cursor-not-allowed
+    text-opacity-30
 }

@@ -16,8 +16,16 @@ export const App: Component = () => {
                 <Select
                     placeholder="select your option"
                     onValueChange={valueChange}
-                    value={10}
+                    value={-1}
                 >
+                    <Option
+                        value={-1}
+                    >
+                        <div class="inline-flex flex-col items-start max-w-xs">
+                            <strong>Lorem ipsum.</strong>
+                            <span class="inline-block w-full truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit.!</span>
+                        </div>
+                    </Option>
                     <For each={options}>
                         {(_, i) => (
                             <Option value={i() + 1}>Option {i() + 1}</Option>

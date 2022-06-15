@@ -12,7 +12,7 @@ import { Portal } from 'solid-js/web';
 import { usePopper } from './popper/usePopper';
 import { Fade } from './assets/Fade';
 import { TestSelectors, useSelect } from './Select';
-import { isArray, isOptionChecked } from './utils/utils';
+import { findOption, isArray, isChecked } from './utils/utils';
 
 type DropdownProps = {
     reference: Accessor<HTMLElement | undefined>;
@@ -33,7 +33,7 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
     createEffect(on(show, (isShow) => {
         const items = options();
         const opts = isArray(items) ? items : [items];
-        isShow && focusOption(opts as HTMLElement[]);
+        isShow && focusOption(opts as HTMLButtonElement[]);
     }, {defer: true}));
 
     onCleanup(() => {
@@ -42,10 +42,10 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
 
     const options = children(() => props.children);
 
-    const focusOption = (options: HTMLElement[]) => {
-        for (let opt of options) {
-            if (isOptionChecked(opt)) {
-                opt.focus();
+    const focusOption = (options: HTMLButtonElement[]) => {
+        for (let option of options) {
+            if (isChecked(option)) {
+                option.focus();
                 return;
             }
         }
@@ -63,7 +63,7 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
     const close = () => setShow(false);
 
     const onKeyDown = (e: KeyboardEvent) => {
-        const option = e.target as HTMLElement;
+        const option = e.target as HTMLButtonElement;
         switch (e.code) {
             case 'Escape':
                 e.preventDefault();
@@ -71,12 +71,12 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
                 break;
             case 'ArrowDown':
                 e.preventDefault();
-                const nextOption = option.nextElementSibling as HTMLElement;
+                const nextOption = findOption(option, 'next');
                 nextOption?.focus();
                 break;
             case 'ArrowUp':
                 e.preventDefault();
-                const prevOption = option.previousElementSibling as HTMLElement;
+                const prevOption = findOption(option, 'prev');
                 prevOption?.focus();
                 break;
         }
@@ -92,13 +92,13 @@ export const Dropdown = (props: ParentProps<DropdownProps>) => {
                 >
                     <Fade onDone={close}>
                         <Show when={props.show}>
-                            <ul
+                            <div
                                 data-testid={TestSelectors.DROPDOWN}
                                 class="dropdown"
                                 onKeyDown={onKeyDown}
                             >
                                 {options()}
-                            </ul>
+                            </div>
                         </Show>
                     </Fade>
                 </div>
