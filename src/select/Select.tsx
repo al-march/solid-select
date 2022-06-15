@@ -49,6 +49,7 @@ export type SelectProps<T> = {
     show?: boolean;
     value?: T;
     onValueChange?: (v: T) => void;
+    customView?: (v: string) => JSXElement;
 }
 
 export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
@@ -95,15 +96,22 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
         selectRef()?.focus();
     };
 
-    const defaultValueView = createMemo<JSXElement>(() => {
+    const createView = (v: string) => {
+        const isCustom = !!props.customView;
+        return isCustom
+            ? props.customView?.(v)
+            : <span>{v}</span>;
+    };
+
+    const selectValue = createMemo<JSXElement>(() => {
         const value = state.value;
         if (isObject(value)) {
-            return <span>{(value as object).toString()}</span>;
+            return createView((value as object).toString());
         }
         if (isArray(value)) {
-            return (value as T[]).map(v => <span>{v as string}</span>);
+            return (value as T[]).map(v => createView(v as string));
         }
-        return <span>{value as string}</span>;
+        return createView(value as string);
     });
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -146,7 +154,7 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
                                 </span>
                             }
                         >
-                            {defaultValueView()}
+                            {selectValue()}
                         </Show>
                     </span>
                     <span class="select-icon">
