@@ -11,7 +11,8 @@ import {
 import { createStore } from 'solid-js/store';
 import { DropdownIcon } from './assets/DropdownIcon';
 import { Dropdown } from './Dropdown';
-import { isArray, isObject } from './utils/utils';
+import { toArray } from './utils/utils';
+import { SelectValue } from './SelectValue';
 
 export const enum TestSelectors {
     SELECT = 'select',
@@ -99,25 +100,24 @@ export function Select<T extends any>(props: ParentProps<SelectProps<T>>) {
         selectRef()?.focus();
     };
 
-    const createView = (v: string) => {
-        return <span>{v}</span>;
-    };
-
     const selectValue = createMemo<JSXElement>(() => {
         const isCustom = !!props.customView;
         const value = state.value;
 
-        if (isCustom && value) {
-            return props.customView?.(value);
+        if (!value) {
+            return '';
         }
 
-        if (isObject(value)) {
-            return createView((value as object).toString());
+        const asArray = toArray(value);
+        if (isCustom) {
+            return asArray.map(v => (
+                <SelectValue onRemove={reset}>{props.customView?.(v)}</SelectValue>
+            ));
+        } else {
+            return asArray.map(v => (
+                <SelectValue onRemove={reset}>{v as string}</SelectValue>
+            ));
         }
-        if (isArray(value)) {
-            return (value as T[]).map(v => createView(v as string));
-        }
-        return createView(value as string);
     });
 
     const onKeyDown = (e: KeyboardEvent) => {

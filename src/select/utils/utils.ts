@@ -4,6 +4,13 @@ export const isObject = (v: unknown) => (
 
 export const isArray = (v: unknown) => Array.isArray(v);
 
+export const toArray = <T>(v: T | T[]): T[] => {
+    if (isArray(v)) {
+        return v as T[];
+    }
+    return [v] as T[];
+};
+
 export const tick = () => Promise.resolve();
 
 export const isChecked = (option: HTMLElement) => (

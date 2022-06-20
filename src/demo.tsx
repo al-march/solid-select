@@ -17,8 +17,8 @@ export const App: Component = () => {
                     onValueChange={valueChange}
                     compareKey={v => v?.name}
                     customView={v => (
-                        <span style="width: 200px" class="text-left truncate">
-                            {v.unicodeFlag} {v.name} {v.iso2}
+                        <span class="text-left truncate">
+                            {v.unicodeFlag} {v.iso2}
                         </span>
                     )}
                 >
